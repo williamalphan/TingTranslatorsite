@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ting Global Translator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+
+<!-- HEADER -->
+<header class="p-4 bg-gray-800 flex justify-between items-center">
+  <h1 class="text-xl font-bold text-blue-400">🌍 Ting Global Translator</h1>
+  <nav class="space-x-4 text-sm">
+    <a href="#app" class="hover:text-blue-400">App</a>
+    <a href="#business" class="hover:text-blue-400">Business</a>
+    <a href="#pricing" class="hover:text-blue-400">Pricing</a>
+  </nav>
+</header>
+
+<!-- MAIN APP -->
+<section id="app" class="flex-1 flex flex-col items-center justify-center p-6">
+  <h2 class="text-2xl font-semibold mb-4">🎤 English → 🈶 Chinese Voice Translator</h2>
+
+  <button onclick="startListening()" class="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-full text-lg mb-6">
+    Start Speaking
+  </button>
+
+  <div class="w-full max-w-2xl grid gap-4">
+    <div>
+      <label class="text-sm text-gray-400">English</label>
+      <div id="englishText" class="p-3 bg-gray-800 rounded min-h-[50px]"></div>
+    </div>
+
+    <div>
+      <label class="text-sm text-gray-400">Chinese</label>
+      <div id="chineseText" class="p-3 bg-gray-800 rounded min-h-[50px]"></div>
+    </div>
+
+    <button onclick="speakChinese()" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+      🔊 Play Chinese Voice
+    </button>
+  </div>
+</section>
+
+<!-- BUSINESS SECTION -->
+<section id="business" class="bg-gray-800 p-8 text-center">
+  <h2 class="text-2xl font-bold mb-4">Why Ting Global Translator?</h2>
+  <p class="max-w-3xl mx-auto text-gray-300">
+    Ting Global Translator helps businesses communicate instantly between
+    English and Chinese using real-time voice AI.
+    Perfect for hotels, tourism, schools, and global companies.
+  </p>
+
+  <div class="grid md:grid-cols-3 gap-6 mt-6">
+    <div class="bg-gray-900 p-4 rounded">
+      🌐 Global Communication
+    </div>
+    <div class="bg-gray-900 p-4 rounded">
+      ⚡ Fast & Accurate Voice AI
+    </div>
+    <div class="bg-gray-900 p-4 rounded">
+      📱 Works on Phone & PC
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="p-8 text-center">
+  <h2 class="text-2xl font-bold mb-6">Pricing</h2>
+
+  <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+    <div class="bg-gray-800 p-6 rounded">
+      <h3 class="text-lg font-bold">Free Trial</h3>
+      <p class="text-gray-400 mt-2">10 translations / day</p>
+      <p class="mt-4 text-blue-400">FREE</p>
+    </div>
+
+    <div class="bg-blue-600 p-6 rounded">
+      <h3 class="text-lg font-bold">Business</h3>
+      <p class="mt-2">Unlimited usage</p>
+      <p>High-quality voice</p>
+      <p class="mt-4 font-bold">$15 / month</p>
+    </div>
+
+    <div class="bg-gray-800 p-6 rounded">
+      <h3 class="text-lg font-bold">Enterprise</h3>
+      <p class="mt-2">Custom API</p>
+      <p>Branding</p>
+      <p class="mt-4 font-bold">Contact Us</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-gray-800 p-4 text-center text-sm text-gray-400">
+  © 2026 Ting Global Translator • All Rights Reserved
+</footer>
+
+<script>
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = "en-US";
+
+function startListening() {
+  recognition.start();
+}
+
+recognition.onresult = async (event) => {
+  const english = event.results[0][0].transcript;
+  document.getElementById("englishText").innerText = english;
+
+  const response = await fetch("https://libretranslate.de/translate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      q: english,
+      source: "en",
+      target: "zh",
+      format: "text"
+    })
+  });
+
+  const data = await response.json();
+  document.getElementById("chineseText").innerText = data.translatedText;
+};
+
+function speakChinese() {
+  const text = document.getElementById("chineseText").innerText;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "zh-CN";
+  speechSynthesis.speak(utterance);
+}
+</script>
+
+</body>
+</html>
